@@ -1,0 +1,12 @@
+.idea/
+log/
+dist/
+rpmbuild/
+__pycache__/
+.DS_Store
+local*.yaml
+*.iml
+*.log
+LICENSE
+*.py[cod]
+*$py.class
