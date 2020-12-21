@@ -15,6 +15,7 @@ from bin import federal_founds_rate
 from bin import us_etf
 from bin import jobless_claims
 from bin import us_etf_ark
+from bin import gld
 
 logger = logging.getLogger(__name__)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -70,6 +71,7 @@ def run():
             treasury.bin()
             federal_founds_rate.bin()
             jobless_claims.bin()
+            gld.bin()
 
             # etf
             us_etf.bin()

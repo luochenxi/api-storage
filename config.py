@@ -29,6 +29,7 @@ TREASURY_REAL_RATES_SRC_DATA = os.path.join(DATA_US_DIR, 'treasury_real_rates.js
 FEDERAL_FUNDS_RATE_SRC_DATA = os.path.join(DATA_US_DIR, 'federal_founds_rate.json')
 US_INITIAL_JOBLESS_SRC_DATA = os.path.join(DATA_US_DIR, 'initial_jobless.json')
 US_CONTINUING_JOBLESS_SRC_DATA = os.path.join(DATA_US_DIR, 'continuing_jobless.json')
+US_GLD_SRC_DATA = os.path.join(DATA_US_DIR, 'gld.csv')
 
 NEWYORKFED_SOMA_HOLD_URL = "https://markets.newyorkfed.org/read?productCode=30&startDt={}&endDt={}&query=summary&format=json"
 NEWYORKFED_WEI_URL = "https://www.newyorkfed.org/medialibrary/research/interactives/data//wei_data.csv"
@@ -49,6 +50,7 @@ TREASURY_REAL_RATES_URL = "https://www.treasury.gov/resource-center/data-chart-c
 FEDERAL_FUNDS_RATE_URL = "https://ycharts.com/charts/fund_data.json?annotations=&annualizedReturns=false&calcs=&chartType=interactive&chartView=&correlations=&dateSelection=range&displayDateRange=false&displayTicker=false&endDate=&format=real&legendOnChart=false&note=&partner=basic_2000&quoteLegend=false&recessions=false&scaleType=linear&securities=id%3AI%3AEFFRND%2Cinclude%3Atrue%2C%2C&securityGroup=&securitylistName=&securitylistSecurityId=&source=false&splitType=single&startDate=&title=&units=false&useCustomColors=false&useEstimates=false&zoom=5&redesign=true&maxPoints=787"
 US_INITIAL_JOBLESS_URL = "https://sbcharts.investing.com/events_charts/us/294.json"
 US_CONTINUING_JOBLESS_URL = "https://sbcharts.investing.com/events_charts/us/522.json"
+GLD_URL = "http://www.spdrgoldshares.com/assets/dynamic/GLD/GLD_US_archive_EN.csv"
 
 NEWYORKFED_HOLD_OUTPUT_NAME = 'newyorkfed_makert_hold.json'
 NEWYORKFED_WEI_NAME = 'newyorkfed_wei.json'
@@ -63,6 +65,7 @@ INITIAL_JOBLESS_OUTPUT = os.path.join(OUTPUT, 'initial_jobless.json')
 CONTINUING_JOBLESS_OUTPUT = os.path.join(OUTPUT, 'continuing_jobless.json')
 US_JOBLESS_OUTPUT = os.path.join(OUTPUT, 'us_jobless.json')
 CPI_FFR_OUTPUT = os.path.join(OUTPUT, 'cpi_ffr.json')
+GLD_OUTPUT = os.path.join(OUTPUT, 'gld.json')
 TREASURY_REAL_RATES_NAME = 'treasury_real_rates_{}.json'
 FEDERAL_FUNDS_RATE_NAME = 'federal_founds_rate_{}.json'
 
