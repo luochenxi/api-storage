@@ -41,6 +41,7 @@ def run():
     if len(list(origin)) < len(df): # 有新的数据
         # 转换时间格式
         df['Date'] = df.apply(lambda item: strfdate(item['Date'], ), axis = 1)
+        df = df.rename(columns={' GLD Close': 'GLD Close', ' Total Net Asset Value Tonnes in the Trust as at 4.15 p.m. NYT': 'TNAVT'})
         df.to_csv(cf.US_GLD_SRC_DATA)
         split_output(df.to_dict(orient='records'))
 
