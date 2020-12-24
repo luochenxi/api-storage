@@ -35,15 +35,21 @@ def run():
     resp = utils.get(cf.GLD_URL)
     # header 在第6行
     df = pd.read_csv(io.StringIO(resp.text), header=6)
-    df = df[~df[' GLD Close'].str.contains('HOLIDAY')]
     df = df[cl] # 取指定列
+    df = df.rename(columns={' GLD Close': 'GLD_Close', ' Total Net Asset Value Tonnes in the Trust as at 4.15 p.m. NYT': 'TNAVT'})
+    # 去除文字行
+    df = df[~df['GLD_Close'].str.contains('HOLIDAY')]
+    df = df[~df['GLD_Close'].str.contains('AWAITED')]
+    df = df[~df['GLD_Close'].str.contains('NYSE Closed')]
+    df = df[~df['TNAVT'].str.contains('AWAITED')]
 
-    if len(list(origin)) < len(df): # 有新的数据
+    # if len(list(origin)) < len(df): # 有新的数据
         # 转换时间格式
-        df['Date'] = df.apply(lambda item: strfdate(item['Date'], ), axis = 1)
-        df = df.rename(columns={' GLD Close': 'GLD Close', ' Total Net Asset Value Tonnes in the Trust as at 4.15 p.m. NYT': 'TNAVT'})
-        df.to_csv(cf.US_GLD_SRC_DATA)
-        split_output(df.to_dict(orient='records'))
+    df['Date'] = df.apply(lambda item: strfdate(item['Date'], ), axis = 1)
+    df['GLD_Close'] = df['GLD_Close'].astype('float')
+    df['TNAVT'] = df['TNAVT'].astype('float')
+    df.to_csv(cf.US_GLD_SRC_DATA)
+    split_output(df.to_dict(orient='records'))
 
 
 
@@ -58,6 +64,8 @@ def split_output(data, y=[5,]):
             _t = datetime.strptime(item['Date'], "%Y-%m-%d")
             _t = date(year=_t.year, month=_t.month, day=_t.day)
             if i <= _t:
+                # item['GLD_Close'] = float(item['GLD_Close'])
+                # item['TNAVT'] = float(item['TNAVT'])
                 c.append(item)
         utils.save_ouput(c, cf.GLD_OUTPUT)
 
