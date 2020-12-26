@@ -108,6 +108,22 @@ def all_output(data, etf, day=22):
         res.append(d)
     utils.save_ouput(res, config.ALL_ETF_OUTPUT)
 
+@retry(stop_max_attempt_number=20, wait_fixed=3)
+def sp500smi():
+    etd_data = yf.Ticker("^GSPC")
+    data = etd_data.history(period="1mo", interval="30m")
+    first = data.resample("D")['Close'].first().dropna(axis=0,how='any')
+    last = data.resample("D")['Close'].last().dropna(axis=0,how='any')
+    l = list(last - first)
+    l = [i+2000 for i in l]
+    ret = []
+    for idx, i in enumerate(first.index):
+        ret.append({
+            "Date": str(i).split()[0],
+            "val": l[idx]
+        })
+    utils.save_ouput(ret, config.SP500_SMI_OUTPUT)
+
 
 def run():
     new_data = get_xq()
@@ -119,6 +135,7 @@ def run():
     logger.info("SAVE ETF  DATA...")
     utils.write(config.ALL_ETF_DIR, new_data)
     all_output(new_data, "ALL")
+    sp500smi()
 
 def bin():
     current = utils.now()
@@ -131,7 +148,8 @@ def bin():
     logger.info('NOT ETF TIME.')
 
 if __name__ == '__main__':
-    run()
+    # run()
+    sp500smi()
     # test()
     #
     # df = pro.us_daily(ts_code='VTI', start_date='20201001', end_date='20201130')

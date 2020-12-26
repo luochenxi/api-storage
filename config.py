@@ -66,6 +66,7 @@ CONTINUING_JOBLESS_OUTPUT = os.path.join(OUTPUT, 'continuing_jobless.json')
 US_JOBLESS_OUTPUT = os.path.join(OUTPUT, 'us_jobless.json')
 CPI_FFR_OUTPUT = os.path.join(OUTPUT, 'cpi_ffr.json')
 GLD_OUTPUT = os.path.join(OUTPUT, 'gld.json')
+SP500_SMI_OUTPUT = os.path.join(OUTPUT, 'sp500smi.json')
 TREASURY_REAL_RATES_NAME = 'treasury_real_rates_{}.json'
 FEDERAL_FUNDS_RATE_NAME = 'federal_founds_rate_{}.json'
 
