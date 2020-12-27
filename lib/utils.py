@@ -174,6 +174,13 @@ def split_save_json(data, f=None, ft=None, sp=[1,30,100,360]):
         path = os.path.join(f, ft.format(str(i)))
         save_ouput(last_sp, path)
 
+def total_dict(data, data_key):
+    num = Decimal(0.00)
+    for k,v in data.items():
+        if k == "SPX":continue
+        num += Decimal(v[data_key])
+    return float(num.quantize(Decimal('0.00')))
+
 def day_trading_save(data):
     data = sort_data(data)
     tmp = dict(
@@ -204,13 +211,6 @@ def day_trading_save(data):
     day_file.flush()
     day_file.close()
 
-
-def total_dict(data, data_key):
-    num = Decimal(0.00)
-    for k,v in data.items():
-        if k == "SPX":continue
-        num += Decimal(v[data_key])
-    return float(num.quantize(Decimal('0.00')))
 
 def today():
     "美国东部日期"

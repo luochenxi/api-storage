@@ -28,14 +28,17 @@ logger.addHandler(ch)
 
 
 @utils.extract_context_info
-def market_breadth(br):
+def market_breadth(br=None, debug=False):
     path = os.path.join(cf.DATA_US_DIR,'sp500_all.json')
     all = utils.read_json_file(path)
-    breadth.start(br)
-    breadth.loading_page(br)
-    current = breadth.save_last(br)
-    all[current['time']] = current['data']
+    if not debug:
+        breadth.start(br)
+        breadth.loading_page(br)
+        current = breadth.save_last(br)
+        all[current['time']] = current['data']
     utils.save_to_json(path, all)
+    breadth.split_total(all, cf.OUTPUT)
+    # 保存所有数据
     output = os.path.join(cf.OUTPUT, 'sp500_all.json')
     utils.save_to_json(output, all)
     # utils.day_trading_save(all)

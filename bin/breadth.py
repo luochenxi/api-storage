@@ -1,6 +1,7 @@
 import logging
 import json
 import sys
+import copy
 import traceback
 from collections import namedtuple
 
@@ -102,3 +103,26 @@ def save_last(br):
 @utils.extract_context_info
 def quit_browser(br):
     br.quit()
+
+@utils.extract_context_info
+def split_total(data, f=None, sp=[1,30,100,360]):
+    data = utils.sort_data(data)
+
+    for i in sp:
+        last_sp = copy.deepcopy(data[-i:])
+        t1  = list()
+        t2  = list()
+        for j in last_sp:
+            t1.append({
+                "time": j['time'],
+                "total": utils.total_dict(j['data'], 'close')
+            })
+            t2.append({
+                "time": j['time'],
+                "data": j['data'],
+            })
+        path1 = os.path.join(f, 'sp500_total_{}.json'.format(str(i)))
+        path2 = os.path.join(f, 'sp500_class_{}.json'.format(str(i)))
+        utils.save_ouput(t1, path1)
+        utils.save_ouput(t2, path2)
+
