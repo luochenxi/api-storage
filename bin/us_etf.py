@@ -1,7 +1,5 @@
-import ssl
 import os
 import logging
-import urllib3
 import time
 import yfinance as yf
 from datetime import date
@@ -96,8 +94,29 @@ def etf_output(data, etf, day=22):
     path = os.path.join(config.US_ETF_OUTPUT, "{}.json".format(etf))
     utils.save_ouput(res, path)
 
+def fangman(data)-> dict:
+    ret = dict()
+    for k,v in data.items():
+        FANGMAN = {
+            'Open':0,
+            'High':0,
+            'Low':0,
+            'Close':0,
+            'Adj Close':0,
+        }
+        for i in config.FANGMAN:
+            item = v.pop(i)
+            FANGMAN['Adj Close'] += item['Adj Close']
+            FANGMAN['Open'] += item['Open']
+            FANGMAN['High'] += item['High']
+            FANGMAN['Low'] += item['Low']
+            FANGMAN['Close'] += item['Close']
+        v['FANGMAN'] = FANGMAN
+        ret[k] = v
+    return ret
 
 def all_output(data, etf, day=22):
+    data = fangman(data)
     _sort = sorted(data.items(),key=lambda x:x[0])
     res = []
     for i in _sort[-day:]:

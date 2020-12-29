@@ -155,7 +155,22 @@ ETF_LIST = [
     'IGV',
     'SOXX',
     'XLU',
+    'AAPL',
+    'FB',
+    'AMZN',
+    'MSFT',
+    'NVDA',
+    'NFLX',
+    'GOOG',
 ]
+
+FANGMAN = [    'AAPL',
+               'FB',
+               'AMZN',
+               'MSFT',
+               'NVDA',
+               'NFLX',
+               'GOOG',]
 
 ARK_DATA_URL_LIST = [
     {'fund':'ARKK', 'url':'https://ark-funds.com/wp-content/fundsiteliterature/csv/ARK_INNOVATION_ETF_ARKK_HOLDINGS.csv'},
