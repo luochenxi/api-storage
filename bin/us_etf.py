@@ -17,11 +17,11 @@ logger = logging.getLogger(__name__)
 yf.pdr_override()
 
 def day_range():
-    start = date.today() - relativedelta(days=2)
+    start = date.today() - relativedelta(days=40)
     end = date.today() + relativedelta(days=1)
     return start.isoformat(), end.isoformat()
 
-@retry(stop_max_attempt_number=20, wait_fixed=3)
+@retry(stop_max_attempt_number=5  , wait_fixed=3)
 def get_data():
     start, end = day_range()
     CU_ALL = {}
@@ -51,6 +51,34 @@ def get_data():
         etf_output(src_data, etf)
     return CU_ALL
 
+@retry(stop_max_attempt_number=3, wait_fixed=3)
+def get_left(day=30):
+    start, end = day_range()
+    CU_ALL = {}
+    for item in config.LEFT:
+        logger.info("GET DATA: {}".format(item))
+        item_data = pdr.get_data_yahoo(item, start=start, end=end)
+        data_records = item_data.to_dict(orient='records')
+        data_index = item_data.to_dict(orient='index')
+        # 格式化数据
+        ret = dict()
+        for idx, i in enumerate(data_index):
+            d = str(i).split(" ")[0]
+            ret[d] = data_records[idx]
+            if not CU_ALL.get(d, None):
+                CU_ALL[d] = {item: data_records[idx]}
+            else:
+                CU_ALL[d][item] = data_records[idx]
+
+    ret = {}
+    num = 0
+    for k,v in CU_ALL.items():
+        if num >=day:
+            return ret
+        ret[k]=v
+        num += 1
+
+    return CU_ALL
 
 
 def get_xq():
@@ -127,6 +155,17 @@ def all_output(data, etf, day=22):
         res.append(d)
     utils.save_ouput(res, config.ALL_ETF_OUTPUT)
 
+def save_left(data, day=22):
+    _sort = sorted(data.items(),key=lambda x:x[0])
+    res = []
+    for i in _sort[-day:]:
+        d = dict(Date=i[0])
+        for etf,val in i[1].items():
+            adj_close = Decimal(val['Adj Close']).quantize(Decimal("0.00"))
+            d[etf] = float(adj_close)
+        res.append(d)
+    utils.save_ouput(res, config.DASHBOARD_LEFT)
+
 @retry(stop_max_attempt_number=20, wait_fixed=3)
 def sp500smi():
     etd_data = yf.Ticker("^GSPC")
@@ -143,9 +182,9 @@ def sp500smi():
         })
     utils.save_ouput(ret, config.SP500_SMI_OUTPUT)
 
-
 def run():
     new_data = get_xq()
+    left_data = get_left()
     # src_data = utils.read(config.ALL_ETF_DIR)
     # for k,v in new_data.items():
     #     if k in src_data: continue
@@ -153,8 +192,9 @@ def run():
     #     src_data[k]=v
     logger.info("SAVE ETF  DATA...")
     utils.write(config.ALL_ETF_DIR, new_data)
+    utils.write(config.BOARD_LEFT, left_data)
     all_output(new_data, "ALL")
-    sp500smi()
+    save_left(left_data)
 
 def bin():
     current = utils.now()
@@ -167,8 +207,9 @@ def bin():
     logger.info('NOT ETF TIME.')
 
 if __name__ == '__main__':
-    # run()
-    sp500smi()
+    run()
+    # sp500smi()
+    # print(get_left())
     # test()
     #
     # df = pro.us_daily(ts_code='VTI', start_date='20201001', end_date='20201130')

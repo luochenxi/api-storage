@@ -12,6 +12,7 @@ DATA_DIR = os.path.join(BASE_DIR, 'data')
 DATA_US_DIR = os.path.join(BASE_DIR, 'data', 'us')
 DATA_US_ETF_DIR = os.path.join(BASE_DIR, 'data', 'us', 'etf')
 ALL_ETF_DIR = os.path.join(BASE_DIR, 'data', 'us', 'etf', "ALL.json")
+BOARD_LEFT = os.path.join(BASE_DIR, 'data', "BOARD_LEFT.json")
 OUTPUT = os.path.join(BASE_DIR, os.getenv("OUTPUT", 'output'))
 US_ETF_OUTPUT = os.path.join(BASE_DIR, os.getenv("OUTPUT", 'output'), 'etf')
 ALL_ETF_OUTPUT = os.path.join(US_ETF_OUTPUT, "ALL.json")
@@ -67,6 +68,7 @@ US_JOBLESS_OUTPUT = os.path.join(OUTPUT, 'us_jobless.json')
 CPI_FFR_OUTPUT = os.path.join(OUTPUT, 'cpi_ffr.json')
 GLD_OUTPUT = os.path.join(OUTPUT, 'gld.json')
 SP500_SMI_OUTPUT = os.path.join(OUTPUT, 'sp500smi.json')
+DASHBOARD_LEFT = os.path.join(OUTPUT, 'board_left.json')
 TREASURY_REAL_RATES_NAME = 'treasury_real_rates_{}.json'
 FEDERAL_FUNDS_RATE_NAME = 'federal_founds_rate_{}.json'
 
@@ -162,6 +164,38 @@ ETF_LIST = [
     'NVDA',
     'NFLX',
     'GOOG',
+]
+
+LEFT = [
+    "^TNX", # Treasury Yield 10 | UST 10Y Yield
+    "GC=F", # Gold
+    "DX=F", # US Dollar
+    "EURUSD=X", # EUR
+    "JPYUSD=X", # JPY
+    "GBPUSD=X", # GBP
+    "CADUSD=X", # CAD
+    "MXNUSD=X", # MXN
+    "AUDUSD=X", # AUD
+    "KRWUSD=X", # KRW
+    "INRUSD=X", #INR
+    "BTC-USD", # Bitcoin
+    "CL=F", # WEI Crude
+    "BZ=F", # Brent
+    "RB=F", # Gasoline
+    "NG=F", # Natural Gas
+    "GC=F", # Gold
+    "SI=F", # Silver
+    "PL=F", # Platinum
+    "PA=F", # Palladium
+    "ZC=F", # Corn
+    "ZW=F", # Wheat
+    "ZS=F", # Soybean
+    "KC=F", # Coffee
+    "SB=F", # Sugar
+    "CT=F", # Cotton
+    "CC=F", # Cocoa
+    "LE=F", # Live Cattle
+    "ZS=F", # Soybean
 ]
 
 FANGMAN = [    'AAPL',
