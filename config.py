@@ -187,6 +187,7 @@ LEFT = [
     "SI=F", # Silver
     "PL=F", # Platinum
     "PA=F", # Palladium
+    "HG=F", # Copper
     "ZC=F", # Corn
     "ZW=F", # Wheat
     "ZS=F", # Soybean
@@ -195,7 +196,6 @@ LEFT = [
     "CT=F", # Cotton
     "CC=F", # Cocoa
     "LE=F", # Live Cattle
-    "ZS=F", # Soybean
 ]
 
 FANGMAN = [    'AAPL',
