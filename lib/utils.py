@@ -154,7 +154,7 @@ def save_ouput(data, file_name):
         code=1000,
         encryption="AES",
         data = str(base64.b64encode(json_data.encode("utf-8")), encoding='utf-8'),
-        last_time = now().strftime("%Y-%m-%d %H:%M:%S")
+        last_time = now().strftime("%y/%m/%d %H:%M:%S")
     )
     f = open(file_name, 'w')
     json.dump(tmp, f)
