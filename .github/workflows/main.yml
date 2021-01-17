@@ -58,6 +58,8 @@ jobs:
           sudo apt-get install tree
 
       - name: run
+        env:
+          DEBUG: ${{ secrets.DEBUG }}
         run: python3 app.py
 
       - name: Show data files
