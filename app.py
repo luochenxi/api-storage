@@ -66,9 +66,9 @@ def run():
     while True:
         try:
             # market breadth | 市场宽度
-            ioloop.IOLoop.current().run_sync(async_breadth.main)
-            # br = browser()
-            # market_breadth(br)
+            # ioloop.IOLoop.current().run_sync(async_breadth.main)
+            br = browser()
+            market_breadth(br)
 
             # # 经济数据
             newyorkfed.bin()
