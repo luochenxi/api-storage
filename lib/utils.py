@@ -109,7 +109,7 @@ def is_market_open(offset=1):
     :return 2, 开盘前等 1, 开盘run，0, 结束
     """
     if config.DEBUG:
-        return 1
+        return False
     open_time = now().replace(hour=9, minute=30, second=0)
     close_time = now().replace(hour=16, minute=30, second=0)
     current = now()

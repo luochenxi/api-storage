@@ -15,9 +15,16 @@ BASE_FORMAT_URI = "https://stock.xueqiu.com/v5/stock/chart/kline.json?" \
                   "type=before&" \
                   "count={}"
 
+COOLIES = None
+
 def get_cookies():
-    resp = utils.get('https://xueqiu.com')
-    return  {"xq_a_token": resp.cookies["xq_a_token"]}
+    global COOLIES
+    if COOLIES is None:
+        resp = utils.get('https://xueqiu.com')
+        COOLIES = "xq_a_token={};".format(resp.cookies["xq_a_token"])
+        return  COOLIES
+    return COOLIES
+
 
 def get_cookie():
     resp = requests.get('https://xueqiu.com')
@@ -29,6 +36,11 @@ def get_kline(symbol, day=-30):
     if resp.status_code != 200:
         raise HTTPError()
     return resp.json()
+
+
+def format_url(symbol, day=-30):
+    url = BASE_FORMAT_URI.format(symbol, int(time.time() * 1000), day)
+    return url
 
 
 def xq_format(data):

@@ -13,3 +13,4 @@ yfinance
 pandas_datareader>=0.4.0
 Numpy>=1.11.1
 lxml>=4.5.1
+tornado>=6.0

@@ -1,5 +1,6 @@
 import logging
 import sys
+from tornado import ioloop
 import traceback
 from collections import namedtuple
 
@@ -16,6 +17,7 @@ from bin import us_etf
 from bin import jobless_claims
 from bin import us_etf_ark
 from bin import gld
+from bin import async_breadth
 
 logger = logging.getLogger(__name__)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -64,8 +66,9 @@ def run():
     while True:
         try:
             # market breadth | 市场宽度
-            br = browser()
-            market_breadth(br)
+            ioloop.IOLoop.current().run_sync(async_breadth.main)
+            # br = browser()
+            # market_breadth(br)
 
             # # 经济数据
             newyorkfed.bin()
@@ -79,9 +82,8 @@ def run():
             # etf
             us_etf.bin()
             us_etf_ark.bin()
-
-            breadth.quit_browser(br)
-            return 
+            # breadth.quit_browser(br)
+            return
         except Exception as e :
             logger.error(e,exc_info=1)
             raise e
