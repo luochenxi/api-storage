@@ -8,7 +8,6 @@ import os
 import json
 import datetime
 import pandas as pd
-from pyquery import PyQuery as pq
 from tornado import ioloop, gen, httpclient, queues
 from tornado.httputil import HTTPHeaders
 from tornado.httpclient import HTTPRequest
