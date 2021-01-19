@@ -13,17 +13,17 @@ def update_dynamodb(**kwg):
 
     resp = table.update_item(
         Key={
-            'symbol_country': 'US_{}'.format(kwg['symbol']),
+            'hash_key': 'BREADTH_{}_{}'.format("US",kwg['symbol']),
             'date': kwg['date']
         },
-        UpdateExpression='SET o = :o ,c = :c,n = :n, symbol = :symbol, i18n = :i18n, country = :country, updatedAt = :updatedAt',
+        UpdateExpression='SET o = :o ,c = :c,n = :n, symbol = :symbol, i18n = :i18n, data_type = :data_type, updatedAt = :updatedAt',
         ExpressionAttributeValues={
             ':o': kwg['o'],
             ':c': kwg['c'],
             ':n': kwg['name'],
             ':symbol': kwg['symbol'],
             ':i18n': kwg['i18n'],
-            ':country': kwg['country'],
+            ':data_type': kwg['data_type'],
             ':updatedAt': kwg['updatedAt'],
         },
         ReturnValues="UPDATED_NEW"

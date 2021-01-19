@@ -1,4 +1,4 @@
-name: update
+name: update breadth
 
 on:
   workflow_dispatch:
@@ -8,46 +8,44 @@ on:
       - master
 
   schedule:
-    - cron: 30 13 * * 1-5
-    - cron: 50 13 * * 1-5
-    - cron: 10 14 * * 1-5
-    - cron: 20 14 * * 1-5
-    - cron: 30 14 * * 1-5
-    - cron: 40 14 * * 1-5
-    - cron: 50 14 * * 1-5
-    - cron: 00 15 * * 1-5
-    - cron: 10 15 * * 1-5
-    - cron: 30 15 * * 1-5
-    - cron: 40 15 * * 1-5
-    - cron: 50 15 * * 1-5
-    - cron: 00 16 * * 1-5
-    - cron: 10 16 * * 1-5
-    - cron: 20 16 * * 1-5
-    - cron: 30 16 * * 1-5
-    - cron: 40 16 * * 1-5
-    - cron: 50 16 * * 1-5
-    - cron: 05 17 * * 1-5
-    - cron: 10 17 * * 1-5
-    - cron: 20 17 * * 1-5
-    - cron: 30 17 * * 1-5
-    - cron: 50 17 * * 1-5
-    - cron: 10 18 * * 1-5
-    - cron: 20 18 * * 1-5
-    - cron: 30 18 * * 1-5
-    - cron: 40 18 * * 1-5
-    - cron: 50 18 * * 1-5
-    - cron: 10 19 * * 1-5
-    - cron: 20 19 * * 1-5
-    - cron: 30 19 * * 1-5
-    - cron: 40 19 * * 1-5
-    - cron: 50 19 * * 1-5
-    - cron: 10 20 * * 1-5
-    - cron: 30 20 * * 1-5
-    - cron: 50 20 * * 1-5
-    - cron: 30 21 * * 1-5
-    - cron: 30 22 * * 1-5
-
-
+     - cron: 30 13 * * 1-5
+     - cron: 50 13 * * 1-5
+     - cron: 10 14 * * 1-5
+     - cron: 20 14 * * 1-5
+     - cron: 30 14 * * 1-5
+     - cron: 40 14 * * 1-5
+     - cron: 50 14 * * 1-5
+     - cron: 00 15 * * 1-5
+     - cron: 10 15 * * 1-5
+     - cron: 30 15 * * 1-5
+     - cron: 40 15 * * 1-5
+     - cron: 50 15 * * 1-5
+     - cron: 00 16 * * 1-5
+     - cron: 10 16 * * 1-5
+     - cron: 20 16 * * 1-5
+     - cron: 30 16 * * 1-5
+     - cron: 40 16 * * 1-5
+     - cron: 50 16 * * 1-5
+     - cron: 05 17 * * 1-5
+     - cron: 10 17 * * 1-5
+     - cron: 20 17 * * 1-5
+     - cron: 30 17 * * 1-5
+     - cron: 50 17 * * 1-5
+     - cron: 10 18 * * 1-5
+     - cron: 20 18 * * 1-5
+     - cron: 30 18 * * 1-5
+     - cron: 40 18 * * 1-5
+     - cron: 50 18 * * 1-5
+     - cron: 10 19 * * 1-5
+     - cron: 20 19 * * 1-5
+     - cron: 30 19 * * 1-5
+     - cron: 40 19 * * 1-5
+     - cron: 50 19 * * 1-5
+     - cron: 10 20 * * 1-5
+     - cron: 30 20 * * 1-5
+     - cron: 50 20 * * 1-5
+     - cron: 30 21 * * 1-5
+     - cron: 30 22 * * 1-5
 
 jobs:
   GetData:
@@ -71,4 +69,4 @@ jobs:
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run: python3 app.py
+        run: python3 breadth.py

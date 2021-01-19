@@ -103,6 +103,10 @@ def gen_range_mouth():
     return days[0], days[-1]
 
 
+def i18n(code):
+    """格式化前端需要国家化的字段"""
+    return 'breadth.breadth.{}'.format(code.lower())
+
 def is_market_open(offset=1):
     """
     当地时间： 9：30  16：30

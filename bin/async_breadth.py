@@ -1,13 +1,5 @@
-'''
-https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
-https://www.slickcharts.com/sp500
-'''
-import time
-import os
-import copy
 import json
 import logging
-import awswrangler as wr
 import datetime
 
 import uuid
@@ -22,36 +14,38 @@ from lib import utils
 from lib import xq
 from .oper_dynamodb import update_dynamodb
 
-
 logging.basicConfig(level=logging.INFO, format="[%(name)s][%(funcName)s] %(message)s")
 logging.getLogger("awswrangler").setLevel(logging.DEBUG)
 logging.getLogger("botocore.credentials").setLevel(logging.CRITICAL)
 
-# os.environ['AWS_DEFAULT_REGION'] = 'us-west-2'
+'''
+https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
+https://www.slickcharts.com/sp500
+'''
 
 # 设置pd列数
-pd.set_option('display.max_rows',500)
-pd.set_option('display.max_columns',500)
-pd.set_option('display.width',1000)
+pd.set_option('display.max_rows', 500)
+pd.set_option('display.max_columns', 500)
+pd.set_option('display.width', 1000)
 
 headers = {
     'Content-Type': 'application/json',
     'Cookie': xq.get_cookies()
 }
 url = 'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies'
-concurrency = 50 # 并发数
+concurrency = 50  # 并发数
 GICS = {
     'Communication Services': {'code': 'COM'},
-    'Consumer Discretionary': {'code':'CND'},
-    'Consumer Staples': {'code':'CNS'},
-    'Energy': {'code':'ENE'},
-    'Financials': {'code':'FIN'},
-    'Health Care': {'code':'HLT'},
-    'Industrials': {'code':'IND'},
-    'Materials': {'code':'MAT'},
-    'Real Estate': {'code':'REL'},
-    'Information Technology': {'code':'TEC'},
-    'Utilities': {'code':'UTL'},
+    'Consumer Discretionary': {'code': 'CND'},
+    'Consumer Staples': {'code': 'CNS'},
+    'Energy': {'code': 'ENE'},
+    'Financials': {'code': 'FIN'},
+    'Health Care': {'code': 'HLT'},
+    'Industrials': {'code': 'IND'},
+    'Materials': {'code': 'MAT'},
+    'Real Estate': {'code': 'REL'},
+    'Information Technology': {'code': 'TEC'},
+    'Utilities': {'code': 'UTL'},
 }
 
 SYMBOL = dict()
@@ -70,10 +64,11 @@ def gspc_industry(url=url):
             industry[i['GICS Sector']]['item'].append(i['Symbol'])
         else:
             industry[i['GICS Sector']] = dict()
-            industry[i['GICS Sector']]['item']  = [i['Symbol'],]
-            industry[i['GICS Sector']]['sma20rc']  = []
-            industry[i['GICS Sector']]['sma20ro']  = []
+            industry[i['GICS Sector']]['item'] = [i['Symbol'], ]
+            industry[i['GICS Sector']]['sma20rc'] = []
+            industry[i['GICS Sector']]['sma20ro'] = []
     return data
+
 
 async def get_symbol(url):
     '''
@@ -91,6 +86,7 @@ async def get_symbol(url):
     response = await client.fetch(request)
     return json.loads(response.body)
 
+
 def item_sma(data):
     global SYMBOL, industry
     column = data['data']['column']
@@ -101,7 +97,7 @@ def item_sma(data):
     df['sma20open'] = df["open"].rolling(window=20).mean()
     df['sma20rc'] = df["sma20close"] < df['close']
     df['sma20ro'] = df["sma20open"] < df['open']
-    df['date'] = df['timestamp'].apply(lambda x:datetime.datetime.fromtimestamp(x/1000))
+    df['date'] = df['timestamp'].apply(lambda x: datetime.datetime.fromtimestamp(x / 1000))
     item_industry = SYMBOL[symbol]['name']
     d = -1
     last_rc = df['sma20rc'].iloc[d]
@@ -111,9 +107,10 @@ def item_sma(data):
     industry[item_industry]['date'] = df['date'].iloc[d].strftime("%Y-%m-%d")
     industry[item_industry]['timestamp'] = df['timestamp'].iloc[d]
     if last_rc:
-        industry[item_industry]['sma20ro'].append(int(last_rc))
+        industry[item_industry]['sma20rc'].append(int(last_rc))
     if last_ro:
-        industry[item_industry]['sma20rc'].append(int(last_ro))
+        industry[item_industry]['sma20ro'].append(int(last_ro))
+
 
 def breadth_total():
     '''
@@ -122,18 +119,17 @@ def breadth_total():
     '''
     global SYMBOL, industry, GICS
     ret = []
-    spx_sma20rc = 0     # rc  收盘  r 是结果  c 收盘
-    spx_sma20ro = 0     # ro  开盘  r 是结果  o 开盘
+    spx_sma20rc = 0  # rc  收盘  r 是结果  c 收盘
+    spx_sma20ro = 0  # ro  开盘  r 是结果  o 开盘
     breadth_close = 0
     breadth_open = 0
-    update_at = utils.now().strftime("%y/%m/%d %H:%M:%S")
-    for k,v in industry.items():
-
+    update_at = int(utils.now().timestamp() * 1000)
+    for k, v in industry.items():
         industry_total = len(v['item'])
         spx_sma20rc += len(v['sma20rc'])
         spx_sma20ro += len(v['sma20ro'])
         sma_rc = len(v['sma20rc']) / industry_total * 100
-        sma_ro = len(v['sma20ro'])/ industry_total * 100
+        sma_ro = len(v['sma20ro']) / industry_total * 100
         GICS[k]['sma_rc'] = sma_rc
         GICS[k]['sma_rc_round'] = round(sma_rc)
         GICS[k]['sma_ro_round'] = round(sma_ro)
@@ -156,8 +152,8 @@ def breadth_total():
             name=name,
             o=Decimal(str(open)),
             c=Decimal(str(close)),
-            i18n=i18n(symbol),
-            country="us",
+            i18n=utils.i18n(symbol),
+            data_type="BREADTH_US",
             updatedAt=update_at,
         ))
         # df 的数据部分
@@ -166,14 +162,15 @@ def breadth_total():
         # ret.append(item)
 
     # 计算spx的宽度
-    spx_rc = spx_sma20rc / len(SYMBOL) *100
-    spx_ro = spx_sma20ro / len(SYMBOL) *100
+    spx_rc = spx_sma20rc / len(SYMBOL) * 100
+    spx_ro = spx_sma20ro / len(SYMBOL) * 100
     industry['SPX'] = dict(sma_rc=breadth_close, sma_ro=breadth_open)
     # utils.write('./sma.json', GICS)
     logging.info(industry)
     # utils.write('./gics.json', industry)
-    for k,v in GICS.items():
-        logging.info(f"{v['code']}  \t sma_rc_round: {v['sma_rc_round']} \t sma_ro_round: {v['sma_ro_round']}  \t sma_rc: {v['sma_rc']} \t  sma_ro: {v['sma_ro']} ")
+    for k, v in GICS.items():
+        logging.info(
+            f"{v['code']}  \t sma_rc_round: {v['sma_rc_round']} \t sma_ro_round: {v['sma_ro_round']}  \t sma_rc: {v['sma_rc']} \t  sma_ro: {v['sma_ro']} ")
     logging.info("SPX open: {}; SPX close: {}".format(spx_ro, spx_rc))
     logging.info(f"Total open: {breadth_open}; SPX close: {breadth_close}")
     spx_data = dict(
@@ -182,8 +179,8 @@ def breadth_total():
         date=date,
         o=Decimal(str(spx_ro)),
         c=Decimal(str(spx_rc)),
-        i18n=i18n('SPX'),
-        country="us",
+        i18n=utils.i18n('SPX'),
+        data_type="BREADTH_US",
         updatedAt=update_at,
     )
     total_data = dict(
@@ -192,8 +189,8 @@ def breadth_total():
         date=date,
         o=Decimal(str(breadth_open)),
         c=Decimal(str(breadth_close)),
-        i18n=i18n('TOTAL'),
-        country="us",
+        i18n=utils.i18n('TOTAL'),
+        data_type="BREADTH_US",
         updatedAt=update_at,
     )
     update_dynamodb(**spx_data)
@@ -205,10 +202,6 @@ def breadth_total():
     # df = pd.DataFrame(columns=column, data=ret)
     # wr.dynamodb.put_df(df=df, table_name="Breadth-pro")
 
-
-def i18n(code):
-    """格式化前端需要国家化的字段"""
-    return 'breadth.breadth.{}'.format(code.lower())
 
 async def main():
     seen_set = set()
@@ -255,6 +248,7 @@ async def main():
     # 等待所有协程执行完毕
     await workers
 
+    # 处理 SPX 和 Total 的宽度计算
     breadth_total()
 
 
