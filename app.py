@@ -2,21 +2,10 @@ import logging
 import sys
 from tornado import ioloop
 import traceback
-from collections import namedtuple
+from retrying import retry
 
 import config as cf
 from lib import utils
-from lib.browser import *
-from bin import newyorkfed
-from bin import longtermtrends
-from bin import cpi
-from bin import treasury
-from bin import breadth
-from bin import federal_founds_rate
-from bin import us_etf
-from bin import jobless_claims
-from bin import us_etf_ark
-from bin import gld
 from bin import async_breadth
 
 logger = logging.getLogger(__name__)
@@ -47,7 +36,6 @@ def main():
     run()
 
 @utils.extract_context_info
-@retry(stop_max_attempt_number=20, wait_fixed=3)
 def run():
     while True:
         try:

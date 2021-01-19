@@ -20,7 +20,7 @@ from decimal import Decimal
 import config as cf
 from lib import utils
 from lib import xq
-from oper_dynamodb import update_dynamodb
+from .oper_dynamodb import update_dynamodb
 
 
 logging.basicConfig(level=logging.INFO, format="[%(name)s][%(funcName)s] %(message)s")
@@ -154,8 +154,8 @@ def breadth_total():
             symbol=symbol,
             date=date,
             name=name,
-            o=open,
-            c=close,
+            o=Decimal(str(open)),
+            c=Decimal(str(close)),
             i18n=i18n(symbol),
             country="us",
             updatedAt=update_at,
@@ -170,12 +170,12 @@ def breadth_total():
     spx_ro = spx_sma20ro / len(SYMBOL) *100
     industry['SPX'] = dict(sma_rc=breadth_close, sma_ro=breadth_open)
     # utils.write('./sma.json', GICS)
-    print(industry)
+    logging.info(industry)
     # utils.write('./gics.json', industry)
     for k,v in GICS.items():
-        print(f"{v['code']}  \t sma_rc_round: {v['sma_rc_round']} \t sma_ro_round: {v['sma_ro_round']}  \t sma_rc: {v['sma_rc']} \t  sma_ro: {v['sma_ro']} ")
-    print("SPX open: {}; SPX close: {}".format(spx_ro, spx_rc))
-    print(f"Total open: {breadth_open}; SPX close: {breadth_close}")
+        logging.info(f"{v['code']}  \t sma_rc_round: {v['sma_rc_round']} \t sma_ro_round: {v['sma_ro_round']}  \t sma_rc: {v['sma_rc']} \t  sma_ro: {v['sma_ro']} ")
+    logging.info("SPX open: {}; SPX close: {}".format(spx_ro, spx_rc))
+    logging.info(f"Total open: {breadth_open}; SPX close: {breadth_close}")
     spx_data = dict(
         symbol='SPX',
         name='S&P 500',

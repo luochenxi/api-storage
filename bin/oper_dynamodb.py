@@ -16,11 +16,12 @@ def update_dynamodb(**kwg):
             'symbol_country': 'US_{}'.format(kwg['symbol']),
             'date': kwg['date']
         },
-        UpdateExpression='SET o = :o ,c = :c,name = :name, i18n = :i18n, country = :country, updatedAt = :updatedAt',
+        UpdateExpression='SET o = :o ,c = :c,n = :n, symbol = :symbol, i18n = :i18n, country = :country, updatedAt = :updatedAt',
         ExpressionAttributeValues={
             ':o': kwg['o'],
             ':c': kwg['c'],
-            ':name': kwg['name'],
+            ':n': kwg['name'],
+            ':symbol': kwg['symbol'],
             ':i18n': kwg['i18n'],
             ':country': kwg['country'],
             ':updatedAt': kwg['updatedAt'],
