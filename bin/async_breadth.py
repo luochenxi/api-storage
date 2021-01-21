@@ -2,12 +2,12 @@ import json
 import logging
 import datetime
 
-import uuid
 import pandas as pd
 from tornado import ioloop, gen, httpclient, queues
 from tornado.httpclient import HTTPRequest
-from pprint import pprint as pt
+import awswrangler as wr
 from decimal import Decimal
+import numpy as np
 
 import config as cf
 from lib import utils
@@ -50,6 +50,7 @@ GICS = {
 
 SYMBOL = dict()
 industry = dict()
+ALL = dict() # 在SP500里的股票
 
 
 def gspc_industry(url=url):
@@ -86,13 +87,25 @@ async def get_symbol(url):
     response = await client.fetch(request)
     return json.loads(response.body)
 
+cl = 'timestamp volume    open      high       low   close   chg  percent  turnoverrate        amount'.split()
+re_dict = dict(
+    timestamp='date',
+    volume='v',
+    open='o',
+    high='h',
+    low='l',
+    close='c',
+    chg='chg1d',
+    percent='chgp1d',
+)
 
 def item_sma(data):
-    global SYMBOL, industry
+    global SYMBOL, industry, ALL
     column = data['data']['column']
     item = data['data']['item']
     symbol = data['data']['symbol']
     df = pd.DataFrame(columns=column, data=item)
+    ALL[symbol] = df[cl] # 取制指定列
     df['sma20close'] = df["close"].rolling(window=20).mean()
     df['sma20open'] = df["open"].rolling(window=20).mean()
     df['sma20rc'] = df["sma20close"] < df['close']
@@ -227,7 +240,7 @@ async def main():
             try:
                 await fetch_url(url)
             except Exception as e:
-                print(f"exception:{e}")
+                logging.error(f"exception:{e}")
             finally:
                 # 计数器，每进入一个就加1，所以我们调用完了之后，要减去1
                 q.task_done()
@@ -236,7 +249,7 @@ async def main():
     for idx, i in enumerate(industry_data):
         await q.put(i['Symbol'])
 
-    # 启动协程，同时开启三个消费者
+    # 启动协程，同时开启消费者
     workers = gen.multi([worker() for _ in range(concurrency)])
 
     # 会阻塞，直到队列里面没有数据为止
@@ -250,7 +263,33 @@ async def main():
 
     # 处理 SPX 和 Total 的宽度计算
     breadth_total()
+    # 写入到 aws
+    df = ALL.pop('AAPL')
+    df = df_format('AAPL', df)
+    for k,v in ALL.items():
+        # 格式化每个v
+        v = df_format(k,v)
+        df.append(v) # 合并 v
+    wr.dynamodb.put_df(df=df, table_name=cf.BREADTH_TABLE_NAME)
 
+def df_format(k, v):
+    v = v.rename(columns=re_dict) # 重命名列
+    # 格式化时间
+    v['date'] = v['date'].apply(lambda x: datetime.datetime.fromtimestamp(x / 1000).strftime("%Y-%m-%d"))
+    # 计算一段时间的百分比 天
+    v['chgp5d'] = v['c'].pct_change(5)
+    v['chgp20d'] = v['c'].pct_change(20)
+
+    cc = ' o         h         l       c  chg1d  chgp1d  turnoverrate amount chgp20d chgp5d '.split()
+    for i in cc:
+        v[i] = v[i].apply(lambda x: 'NULL' if type(x) is np.nan else x)
+        # 格式化float：dynamodb 不支持float
+        v[i] = v[i].apply(lambda x: '{:.4f}'.format(x) if type(x) is int or type(x) is float else x)
+    v['hash_key'] = 'US_STOCK_' + k
+    v['n'] =  k
+    v['symbol'] = k
+    v['i18n'] = 'us.stock.' + k
+    return v.tail(1)
 
 if __name__ == '__main__':
     ioloop.IOLoop.current().run_sync(main)

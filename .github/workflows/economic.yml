@@ -1,0 +1,32 @@
+name: update economic
+
+on:
+  workflow_dispatch:
+
+  schedule:
+    - cron: 05 13 * * *
+    - cron: 16 20 * * *
+
+jobs:
+  update:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.3.1
+        with:
+          ref: master
+          persist-credentials: false
+
+      - name: pip
+        run: |
+          pip3 install setuptools
+          pip3 install -r requirements.txt
+          sudo apt-get install tree
+
+      - name: run
+        env:
+          DEBUG: ${{ secrets.DEBUG }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: python3 economic.py

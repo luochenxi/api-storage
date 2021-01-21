@@ -12,3 +12,6 @@ lxml>=4.5.1
 tornado>=6.0
 awswrangler
 pynamodb==4.3.3
+html5lib
+quandl
+yfinance

@@ -1,6 +1,8 @@
 import logging
 import boto3
 from retrying import retry
+import awswrangler as wr
+
 
 import config as cf
 
@@ -10,7 +12,7 @@ logger = logging.getLogger(__name__)
 def update_dynamodb(**kwg):
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table(cf.BREADTH_TABLE_NAME)
-
+    # 添加数据/如果数据存在就更新数据
     resp = table.update_item(
         Key={
             'hash_key': 'BREADTH_{}_{}'.format("US",kwg['symbol']),
@@ -31,6 +33,14 @@ def update_dynamodb(**kwg):
     logging.info(resp)
     if 'Attributes' not in resp:
         raise IOError
+
+
+def import_data():
+    # filepath = Path("export.json")
+    # df.to_json(filepath, orient="records")
+    # wr.dynamodb.
+    wr.dynamodb.put_json(path="../export.json", table_name="Breadth-pro")
+    # filepath.unlink()
 
 if __name__ == '__main__':
     update_dynamodb(**dict(

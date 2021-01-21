@@ -167,36 +167,66 @@ ETF_LIST = [
 ]
 
 LEFT = [
-    "^TNX", # Treasury Yield 10 | UST 10Y Yield
-    "GC=F", # Gold
-    "DX=F", # US Dollar
-    "EURUSD=X", # EUR
-    "JPYUSD=X", # JPY
-    "GBPUSD=X", # GBP
-    "CADUSD=X", # CAD
-    "MXNUSD=X", # MXN
-    "AUDUSD=X", # AUD
-    "KRWUSD=X", # KRW
-    "INRUSD=X", #INR
-    "BTC-USD", # Bitcoin
-    "CL=F", # WEI Crude
-    "BZ=F", # Brent
-    "RB=F", # Gasoline
-    "NG=F", # Natural Gas
-    "GC=F", # Gold
-    "SI=F", # Silver
-    "PL=F", # Platinum
-    "PA=F", # Palladium
-    "HG=F", # Copper
-    "ZC=F", # Corn
-    "ZW=F", # Wheat
-    "ZS=F", # Soybean
-    "KC=F", # Coffee
-    "SB=F", # Sugar
-    "CT=F", # Cotton
-    "CC=F", # Cocoa
-    "LE=F", # Live Cattle
+    "^TNX", # Treasury Yield 10 | 'UST 10Y Yield'
+    "DX=F", # 'US Dollar'
+    "EURUSD=X", # 'EUR'
+    "JPYUSD=X", # 'JPY'
+    "GBPUSD=X", # 'GBP'
+    "CADUSD=X", # 'CAD'
+    "MXNUSD=X", # 'MXN'
+    "AUDUSD=X", # 'AUD'
+    "KRWUSD=X", # 'KRW'
+    "INRUSD=X", # 'INR'
+    "BTC-USD", # 'Bitcoin'
+    "CL=F", # 'WEI Crude'
+    "BZ=F", # 'Brent'
+    "RB=F", # 'Gasoline'
+    "NG=F", # 'Natural Gas'
+    "GC=F", # 'Gold'
+    "SI=F", # 'Silver'
+    "PL=F", # 'Platinum'
+    "PA=F", # 'Palladium'
+    "HG=F", # 'Copper'
+    "ZC=F", # 'Corn'
+    "ZW=F", # 'Wheat'
+    "ZS=F", # 'Soybean'
+    "KC=F", # 'Coffee'
+    "SB=F", # 'Sugar'
+    "CT=F", # 'Cotton'
+    "CC=F", # 'Cocoa'
+    "LE=F", # 'Live Cattle'
 ]
+
+LEFT_MAP = {
+    "^TNX" :'UST 10Y Yield',
+    "GC=F":'Gold',
+    "DX=F":'US Dollar',
+    "EURUSD=X":'EUR',
+    "JPYUSD=X":'JPY',
+    "GBPUSD=X":'GBP',
+    "CADUSD=X":'CAD',
+    "MXNUSD=X":'MXN',
+    "AUDUSD=X":'AUD',
+    "KRWUSD=X":'KRW',
+    "INRUSD=X":'INR',
+    "BTC-USD":'Bitcoin',
+    "CL=F":'WEI Crude',
+    "BZ=F":'Brent',
+    "RB=F":'Gasoline',
+    "NG=F":'Natural Gas',
+    "SI=F":'Silver',
+    "PL=F":'Platinum',
+    "PA=F":'Palladium',
+    "HG=F":'Copper',
+    "ZC=F":'Corn',
+    "ZW=F":'Wheat',
+    "ZS=F":'Soybean',
+    "KC=F":'Coffee',
+    "SB=F":'Sugar',
+    "CT=F":'Cotton',
+    "CC=F":'Cocoa',
+    "LE=F":'Live Cattle',
+}
 
 FANGMAN = [    'AAPL',
                'FB',

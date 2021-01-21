@@ -28,7 +28,8 @@
 # Run
 
 ```shell
-python3 app.py
+python3 breadth.py
+python3 economic.py
 ```
 
 # Features
