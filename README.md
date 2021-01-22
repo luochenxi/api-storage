@@ -1,5 +1,8 @@
 # Storage 
 - [Action](https://docs.github.com/cn/actions/reference/events-that-trigger-workflows)
+- [宽度workflow](/.github/workflows/main.yml)
+- [经济数据workflow](/.github/workflows/economic.yml)
+
 # dynamodb
 它和以前理解`NoSql`有点不一样，`dynamodb` 可以理解为是通过`hash_key`和`sort_key`来定位数据，这两列联合唯一。
 如果不做其它的操作（索引），查询和过滤数据比较难以理解。
@@ -41,4 +44,31 @@ ma120: Float
 ema20: Float
 ema60: Float
 ema120: Float
+```
+
+```shell
+# 导出数据
+aws dynamodb scan --table-name TABLE_NAME > export.json
+```
+
+# 数据ID
+
+
+# 国际化ID
+```shell
+# 宽度数据
+breadth.breadth.TOTAL / COM...
+
+# 股票数据
+us.stock.APPL
+us.etf.VTI
+
+# 经济数据
+economic.chart.US_ECONOMIC_WEI
+economic.chart.US_ECONOMIC_FFTRUL
+economic.chart.US_ECONOMIC_FEDFUNDS
+economic.chart.US_ECONOMIC_INFLATION
+economic.chart.ECONOMIC_USTREASURY_REALYIELD
+economic.chart.US_SPDR_GOLD
+economic.chart.US_SYSTEM_SOMA_HOLDINGS
 ```

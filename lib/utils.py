@@ -5,6 +5,7 @@ import copy
 import datetime
 import requests
 import logging
+from datetime import date
 from uuid import uuid4
 from functools import wraps, partial
 from pprint import pprint as pr
@@ -184,6 +185,22 @@ def total_dict(data, data_key):
         if k == "SPX":continue
         num += Decimal(v[data_key])
     return float(num.quantize(Decimal('0.00')))
+
+def day_range():
+    start = date.today() - relativedelta(days=9)
+    end = date.today() + relativedelta(days=1)
+    return start, end
+
+def df_float(df, field, n=3):
+    '''
+    处理aws 不接受float的问题
+    :param df:
+    :param field:
+    :param n:
+    :return:
+    '''
+    format_str = '{:.' + str(n) + 'f}'
+    return  df[field].apply(lambda x: format_str.format(x) if type(x) is int or type(x) is float else x)
 
 def day_trading_save(data):
     data = sort_data(data)

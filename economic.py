@@ -10,6 +10,7 @@ def main():
     economic_index.USTREASURY_REALYIELD()
     # 期货和大宗商品 不全
     yf.get()
+    yf.oli_copper_gold()
 
 
 if __name__ == '__main__':

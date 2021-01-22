@@ -25,7 +25,6 @@ column_dict = {
     "Second Revision": 'second_revision',
     "Final": 'final',
 }
-column = ['date', 'preliminary_estimate', 'first_revision', 'second_revision', 'final']
 
 '''
     # df['preliminary_estimate'] = df['preliminary_estimate'].apply(lambda x: Decimal('%.3f' %  x))
@@ -37,10 +36,12 @@ column = ['date', 'preliminary_estimate', 'first_revision', 'second_revision', '
 def wei():
     """Weekly Economic Index (WEI) https://www.newyorkfed.org/research/policy/weekly-economic-index"""
     resp = utils.get(cf.NEWYORKFED_WEI_URL)
+    column = ['date', 'preliminary_estimate', 'first_revision', 'second_revision', 'final']
     df = pd.read_csv(io.StringIO(resp.text), names=column, header=0)
     # 把 Nan 替换为NULL
     df = df.fillna("NULL")
     df['hash_key'] = "US_ECONOMIC_WEI"
+    df['i18n'] = "economic.chart.US_ECONOMIC_WEI"
     df['date'] = pd.to_datetime(df['date'],infer_datetime_format=True)
     # 1/2/2008 转换为 2008-01-02
     df['date'] = df['date'].apply(lambda x: f(x))
@@ -65,6 +66,7 @@ def fftr():
     column = ['date', 'value']
     df = pd.read_csv(io.StringIO(resp.text),names=column, header=0)
     df['hash_key'] = "US_ECONOMIC_FFTRUL"
+    df['i18n'] = "economic.chart.US_ECONOMIC_FFTRUL"
     df['value'] = df['value'].apply(lambda x: '{:.3f}'.format(x) if type(x) is int or type(x) is float else x)
     # 只更新最后5条数据
     df = df.tail(5)
@@ -78,6 +80,7 @@ def effr():
     column = ['date', 'value']
     df = pd.read_csv(io.StringIO(resp.text),names=column, header=0)
     df['hash_key'] = "US_ECONOMIC_FEDFUNDS"
+    df['i18n'] = "economic.chart.US_ECONOMIC_FEDFUNDS"
     df['value'] = df['value'].apply(lambda x: '{:.3f}'.format(x) if type(x) is int or type(x) is float else x)
     # 只更新最后5条数据
     df = df.tail(3)
@@ -91,6 +94,7 @@ def INFLATION_USA():
     column = ['date', 'value']
     df = pd.read_csv(io.StringIO(resp.text),names=column, header=0)
     df['hash_key'] = "US_ECONOMIC_INFLATION"
+    df['i18n'] = "economic.chart.US_ECONOMIC_INFLATION"
     df['value'] = df['value'].apply(lambda x: '{:.3f}'.format(x) if type(x) is int or type(x) is float else x)
     # 只更新最后5条数据
     df = df.tail(3)
@@ -107,6 +111,7 @@ def USTREASURY_REALYIELD():
     df = df.rename(columns={'Date': 'date'})
     df.columns = column
     df['hash_key'] = 'ECONOMIC_USTREASURY_REALYIELD'
+    df['i18n'] = 'economic.chart.ECONOMIC_USTREASURY_REALYIELD'
     for i in column:
         if i == 'date':
             df['date'] = df['date'].apply(lambda x: f(x))
@@ -140,10 +145,40 @@ def gold():
     df['gold'] = df['gold'].apply(lambda x: '{:.3f}'.format(x) if type(x) is int or type(x) is float else x)
     df['tnavt'] = df['tnavt'].apply(lambda x: '{:.3f}'.format(x) if type(x) is int or type(x) is float else x)
     df['hash_key'] = 'US_SPDR_GOLD'
+    df['i18n'] = 'economic.chart.US_SPDR_GOLD'
     df = df.tail(3)
     wr.dynamodb.put_df(df=df, table_name=cf.BREADTH_TABLE_NAME)
 
+def market_some_hold(url=cf.NEWYORKFED_SOMA_HOLD_URL):
+    '''
+    https://www.newyorkfed.org/markets/soma-holdings
+    :param url:
+    :return:
+    '''
+    start,end = utils.day_range() # 只看最近一周
+    url = url.format(start, end) # url 拼接
 
+    resp = utils.get(url)
+    logger.info("NEWYORKFED: code:{} data: {}".format(resp.status_code, resp.text))
+    if resp.status_code != 200: return
+    resp_dict = resp.json()
+    summary = resp_dict['soma']['summary']
+    # 没有数据
+    if len(summary) == 0: return
+
+    column = ['date', 'mbs', 'cmbs', 'tips', 'frn', 'tipsInflationCompensation',
+              'notesbonds', 'bills', 'agencies', 'total']
+    li = []
+    for k,v in summary.items():
+        li.append([
+            v['asOfDate'], v['mbs'],v['cmbs'],v['tips'],v['frn'],
+            v['tipsInflationCompensation'],v['notesbonds'],v['bills'],v['agencies'],v['total'],
+        ])
+
+    df = pd.DataFrame(columns=column, data=li)
+    df['hash_key'] = 'US_SYSTEM_SOMA_HOLDINGS' # 设置hash_key
+    df['i18n'] = 'economic.chart.US_SYSTEM_SOMA_HOLDINGS'
+    wr.dynamodb.put_df(df=df, table_name=cf.BREADTH_TABLE_NAME)
 
 def f(s):
     return str(s).split()[0]
@@ -154,6 +189,7 @@ def strfdate(str_date):
     return datetime.strptime(str_date, '%d-%b-%Y').strftime('%Y-%m-%d')
 
 if __name__ == '__main__':
+    market_some_hold()
     gold()
     # USTREASURY_REALYIELD()
     # INFLATION_USA()
