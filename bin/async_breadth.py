@@ -264,12 +264,14 @@ async def main():
     # 处理 SPX 和 Total 的宽度计算
     breadth_total()
     # 写入到 aws
+    update_at = int(utils.now().timestamp() * 1000)
     df = ALL.pop('AAPL')
     df = df_format('AAPL', df)
     for k,v in ALL.items():
         # 格式化每个v
         v = df_format(k,v)
-        df.append(v) # 合并 v
+        df = pd.concat([df, v]) # 合并 v
+    df['updatedAt'] = update_at
     wr.dynamodb.put_df(df=df, table_name=cf.BREADTH_TABLE_NAME)
 
 def df_format(k, v):
