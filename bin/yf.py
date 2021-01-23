@@ -51,15 +51,15 @@ def get(li = cf.LEFT):
                 OCG_MAP[i] = copy.deepcopy(df)
 
             df = yf_float(df)
-            # df = df.tail(5) # 取最后数据
+            df = df.tail(3) # 取最后数据
             # 写入 aws
             logger.info(f'Write: {i}')
-            # wr.dynamodb.put_df(df=df, table_name=cf.BREADTH_TABLE_NAME)
-        except req_exec.ConnectionError    :
-            logger.error('req_exec.ConnectionError: {}'.format(i))
+            wr.dynamodb.put_df(df=df, table_name=cf.BREADTH_TABLE_NAME)
+        except req_exec.ConnectionError  as e  :
+            logger.exception(i, e)
             continue
-        except boto_exec.ClientError:
-            logger.error('req_exec.ConnectionError: {}'.format(i))
+        except boto_exec.ClientError as e:
+            logger.exception(i, e)
             continue
 
 @utils.extract_context_info
@@ -92,7 +92,7 @@ def oli_copper_gold():
     cgr = utils.target_float(cgr, ['chgp1d', 'chgp5d', 'chgp20d', 'value'])
     cgr = cgr['date value chgp1d chgp5d chgp20d n i18n hash_key'.split()]
     df = pd.concat([hgr, cgr])
-    df = df.tail(5) # 取最后数据
+    df = df.tail(3) # 取最后数据
     wr.dynamodb.put_df(df=df, table_name=cf.BREADTH_TABLE_NAME)
 
 def ss(s):

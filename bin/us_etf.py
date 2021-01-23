@@ -96,8 +96,8 @@ def item_sma(data):
         FANGMAN[symbol] = df
     else:
         df = dy_float(df)
-        ALL[symbol] = df
-        # ALL[symbol] = df.tail(3)
+        # ALL[symbol] = df
+        ALL[symbol] = df.tail(2)
         # wr.dynamodb.put_df(df=df, table_name=cf.BREADTH_TABLE_NAME)
 
 def fangman():
@@ -112,7 +112,7 @@ def fangman():
     df['hash_key'] = 'US_ETF_FANGMAN'
     df= df.fillna('NULL')
     df = utils.target_float(df, 'c chgp1d chgp5d chgp20d'.split(), 6)
-    # df = df.tail(2)
+    df = df.tail(2)
     wr.dynamodb.put_df(df=df, table_name=cf.BREADTH_TABLE_NAME)
 
 async def main():
