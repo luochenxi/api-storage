@@ -24,7 +24,8 @@ OCG_DF = pd.DataFrame(columns=['date', 'crude_gold', 'copper_gold', 'tnx'])
 
 
 def yf_float(df):
-    for f in ['h','l','c','o','v','ac']:
+    '''浮点数转换'''
+    for f in ['h','l','c','o','v','ac', 'chgp1d', 'chgp5d', 'chgp20d']:
         df[f] = utils.df_float(df, f, 6)
     df.index = range(0,len(df))
     return df
@@ -42,16 +43,19 @@ def get(li = cf.LEFT):
             df['i18n'] = 'dashboard.item.US_{}'.format(ss(i))
             df['hash_key'] = 'US_{}'.format(ss(i))
             df['date'] = df['date'].apply(lambda x: str(x).split()[0])
+            df['chgp1d'] = df["c"].pct_change(1)  * 100
+            df['chgp5d'] = df["c"].pct_change(5)  * 100
+            df['chgp20d'] = df["c"].pct_change(20)  * 100
             # 油金比
             if i in OCG:
                 OCG_MAP[i] = copy.deepcopy(df)
 
             df = yf_float(df)
-            df = df.tail(5) # 取最后数据
+            # df = df.tail(5) # 取最后数据
             # 写入 aws
             logger.info(f'Write: {i}')
-            wr.dynamodb.put_df(df=df, table_name=cf.BREADTH_TABLE_NAME)
-        except req_exec.ConnectionError:
+            # wr.dynamodb.put_df(df=df, table_name=cf.BREADTH_TABLE_NAME)
+        except req_exec.ConnectionError    :
             logger.error('req_exec.ConnectionError: {}'.format(i))
             continue
         except boto_exec.ClientError:
@@ -61,25 +65,34 @@ def get(li = cf.LEFT):
 @utils.extract_context_info
 def oli_copper_gold():
     logger.info(f'run oli_copper_gold...')
-    hg = OCG_MAP['HG=F']
-    gc = OCG_MAP['GC=F']
-    cl = OCG_MAP['CL=F']
+    hg = OCG_MAP['HG=F']    # Copper
+    gc = OCG_MAP['GC=F']    # Gold
+    cl = OCG_MAP['CL=F']    # WEI Crude
     tnx = OCG_MAP['^TNX']
-    tnx['tnx'] = tnx['c']
-    tnx['crude_gold'] = cl['c']/ gc['c']
-    tnx['crude_gold'] = utils.df_float(tnx, 'crude_gold', 7)
-    tnx['copper_gold'] = hg['c']/ gc['c']
-    tnx['copper_gold'] = utils.df_float(tnx, 'copper_gold', 7)
-    tnx['tnx'] = tnx['c']
-    tnx['tnx'] = utils.df_float(tnx, 'tnx', 3)
-    tnx['hash_key'] = 'US_GOLD_COPPER_CRUDE_TNX'
-    tnx['i18n'] = 'economic.chart.US_GOLD_COPPER_CRUDE_TNX'
-    tnx['n'] = 'OilCopperGold Ratio'
-    tnx = tnx[['date', 'tnx', 'crude_gold', 'copper_gold', 'i18n', 'n', 'hash_key']]
-    df = tnx.fillna("NULL")
-    # 写入 aws
+    # 铜金比
+    hgr = copy.deepcopy(hg)
+    hgr['value'] = hg['c']/ gc['c']
+    hgr['hash_key'] = 'US_COPPER_GOLD_RATIO'
+    hgr['chgp1d'] = hgr["value"].pct_change(1)  * 100
+    hgr['chgp5d'] = hgr["value"].pct_change(5)  * 100
+    hgr['chgp20d'] = hgr["value"].pct_change(20)  * 100
+    hgr['n'] = 'CopperGold Ratio'
+    hgr['i18n'] = 'economic.chart.US_GOLD_COPPER_RATIO'
+    hgr = utils.target_float(hgr, ['chgp1d', 'chgp5d', 'chgp20d', 'value'])
+    hgr = hgr['date value chgp1d chgp5d chgp20d n i18n hash_key'.split()]
+    # 油金比
+    cgr = copy.deepcopy(cl)
+    cgr['value'] = cl['c']/ gc['c']
+    cgr['hash_key'] = 'US_CRUDE_GOLD_RATIO'
+    cgr['chgp1d'] = cgr["value"].pct_change(1)  * 100
+    cgr['chgp5d'] = cgr["value"].pct_change(5)  * 100
+    cgr['chgp20d'] = cgr["value"].pct_change(20)  * 100
+    cgr['n'] = 'CrudeGold Ratio'
+    cgr['i18n'] = 'economic.chart.US_GOLD_CRUDE_RATIO'
+    cgr = utils.target_float(cgr, ['chgp1d', 'chgp5d', 'chgp20d', 'value'])
+    cgr = cgr['date value chgp1d chgp5d chgp20d n i18n hash_key'.split()]
+    df = pd.concat([hgr, cgr])
     df = df.tail(5) # 取最后数据
-    logger.info('Write oli_copper_gold...')
     wr.dynamodb.put_df(df=df, table_name=cf.BREADTH_TABLE_NAME)
 
 def ss(s):
@@ -88,6 +101,7 @@ def ss(s):
 if __name__ == '__main__':
     get()
     oli_copper_gold()
+    # TODO BTC 数据不对
     # symbol = "^TNX"
     # df = pdr.get_zdata_yahoo("^TNX", interval = "d")
     # df = df.rename(columns={'High':'h','Low':'l','Open':'o','Close':'c', 'Volume':'v', 'Adj Close':'ac'})

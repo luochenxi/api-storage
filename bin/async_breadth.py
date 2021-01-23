@@ -178,9 +178,7 @@ def breadth_total():
     spx_rc = spx_sma20rc / len(SYMBOL) * 100
     spx_ro = spx_sma20ro / len(SYMBOL) * 100
     industry['SPX'] = dict(sma_rc=breadth_close, sma_ro=breadth_open)
-    # utils.write('./sma.json', GICS)
     logging.info(industry)
-    # utils.write('./gics.json', industry)
     for k, v in GICS.items():
         logging.info(
             f"{v['code']}  \t sma_rc_round: {v['sma_rc_round']} \t sma_ro_round: {v['sma_ro_round']}  \t sma_rc: {v['sma_rc']} \t  sma_ro: {v['sma_ro']} ")
@@ -227,7 +225,7 @@ async def main():
             return
         logging.info(f"get：{symbol}")
         seen_set.add(symbol)
-        symbol_url = xq.format_url(symbol, -40)
+        symbol_url = xq.format_url(symbol, -130)
         data = await get_symbol(symbol_url)
         item_sma(data)
 
@@ -279,10 +277,18 @@ def df_format(k, v):
     # 格式化时间
     v['date'] = v['date'].apply(lambda x: datetime.datetime.fromtimestamp(x / 1000).strftime("%Y-%m-%d"))
     # 计算一段时间的百分比 天
-    v['chgp5d'] = v['c'].pct_change(5)
-    v['chgp20d'] = v['c'].pct_change(20)
+    v['chgp5d'] = v['c'].pct_change(5) *100
+    v['chgp20d'] = v['c'].pct_change(20)*100
+    # 计算sma
+    v['sma20'] = v["c"].rolling(window=20).mean()
+    v['sma60'] = v["c"].rolling(window=60).mean()
+    v['sma120'] = v["c"].rolling(window=120).mean()
+    # 计算cs sm ml
+    v['cs'] = (v['c'] - v['sma20']) / v['sma20'] * 100
+    v['sm'] = (v['sma20'] - v['sma60']) / v['sma60'] * 100
+    v['ml'] = (v['sma60'] - v['sma120']) / v['sma120'] * 100
 
-    cc = ' o         h         l       c  chg1d  chgp1d  turnoverrate amount chgp20d chgp5d '.split()
+    cc = 'o sma20 sma60 sma120 cs sm ml h l c chg1d chgp1d  turnoverrate amount chgp20d chgp5d '.split()
     for i in cc:
         v[i] = v[i].apply(lambda x: 'NULL' if type(x) is np.nan else x)
         # 格式化float：dynamodb 不支持float
@@ -291,7 +297,8 @@ def df_format(k, v):
     v['n'] =  k
     v['symbol'] = k
     v['i18n'] = 'us.stock.' + k
-    return v.tail(1)
+    return v.tail(2) #这里控制数量
+    # return v
 
 if __name__ == '__main__':
     ioloop.IOLoop.current().run_sync(main)

@@ -200,7 +200,7 @@ def df_float(df, field, n=3):
     :return:
     '''
     format_str = '{:.' + str(n) + 'f}'
-    return  df[field].apply(lambda x: format_str.format(x) if type(x) is int or type(x) is float else x)
+    return  df[field].apply(lambda x: format_str.format(x) if type(x) is float else x)
 
 def day_trading_save(data):
     data = sort_data(data)
@@ -232,6 +232,12 @@ def day_trading_save(data):
     day_file.flush()
     day_file.close()
 
+
+def target_float(df, field, n = 6):
+    for i in field:
+        df[i] = df_float(df, i, n)
+    df.index = range(0,len(df))
+    return df
 
 def today():
     "美国东部日期"

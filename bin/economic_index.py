@@ -44,6 +44,7 @@ def wei():
     # 把 Nan 替换为NULL
     df = df.fillna("NULL")
     df['hash_key'] = "US_ECONOMIC_WEI"
+    df['n'] = "Weekly Economic Index (WEI)"
     df['i18n'] = "economic.chart.US_ECONOMIC_WEI"
     df['date'] = pd.to_datetime(df['date'],infer_datetime_format=True)
     # 1/2/2008 转换为 2008-01-02
@@ -70,6 +71,7 @@ def fftr():
     column = ['date', 'value']
     df = pd.read_csv(io.StringIO(resp.text),names=column, header=0)
     df['hash_key'] = "US_ECONOMIC_FFTRUL"
+    df['n'] = "Federal Funds Target Range - Upper Limit"
     df['i18n'] = "economic.chart.US_ECONOMIC_FFTRUL"
     df['value'] = df['value'].apply(lambda x: '{:.3f}'.format(x) if type(x) is int or type(x) is float else x)
     # 只更新最后5条数据
@@ -85,6 +87,7 @@ def effr():
     column = ['date', 'value']
     df = pd.read_csv(io.StringIO(resp.text),names=column, header=0)
     df['hash_key'] = "US_ECONOMIC_FEDFUNDS"
+    df['n'] = "Effective Federal Funds Rate"
     df['i18n'] = "economic.chart.US_ECONOMIC_FEDFUNDS"
     df['value'] = df['value'].apply(lambda x: '{:.3f}'.format(x) if type(x) is int or type(x) is float else x)
     # 只更新最后5条数据
@@ -100,11 +103,11 @@ def INFLATION_USA():
     column = ['date', 'value']
     df = pd.read_csv(io.StringIO(resp.text),names=column, header=0)
     df['hash_key'] = "US_ECONOMIC_INFLATION"
+    df['n'] = "Inflation Rates (CPI)"
     df['i18n'] = "economic.chart.US_ECONOMIC_INFLATION"
     df['value'] = df['value'].apply(lambda x: '{:.3f}'.format(x) if type(x) is int or type(x) is float else x)
     # 只更新最后5条数据
     df = df.tail(3)
-    # print(df)
     # 写入到 aws dynamodb
     wr.dynamodb.put_df(df=df, table_name=cf.BREADTH_TABLE_NAME)
 
@@ -118,6 +121,7 @@ def USTREASURY_REALYIELD():
     df = df.rename(columns={'Date': 'date'})
     df.columns = column
     df['hash_key'] = 'ECONOMIC_USTREASURY_REALYIELD'
+    df['n'] = 'Daily Treasury Real Yield Curve Rates'
     df['i18n'] = 'economic.chart.ECONOMIC_USTREASURY_REALYIELD'
     for i in column:
         if i == 'date':
@@ -153,6 +157,7 @@ def gold():
     df['gold'] = df['gold'].apply(lambda x: '{:.3f}'.format(x) if type(x) is int or type(x) is float else x)
     df['tnavt'] = df['tnavt'].apply(lambda x: '{:.3f}'.format(x) if type(x) is int or type(x) is float else x)
     df['hash_key'] = 'US_SPDR_GOLD'
+    df['n'] = 'SPDR Gold Shares'
     df['i18n'] = 'economic.chart.US_SPDR_GOLD'
     df = df.tail(3)
     wr.dynamodb.put_df(df=df, table_name=cf.BREADTH_TABLE_NAME)
@@ -186,6 +191,7 @@ def market_some_hold(url=cf.NEWYORKFED_SOMA_HOLD_URL):
 
     df = pd.DataFrame(columns=column, data=li)
     df['hash_key'] = 'US_SYSTEM_SOMA_HOLDINGS' # 设置hash_key
+    df['n'] = 'System Open Market Account Holdings of Domestic Securities' # 设置hash_key
     df['i18n'] = 'economic.chart.US_SYSTEM_SOMA_HOLDINGS'
     wr.dynamodb.put_df(df=df, table_name=cf.BREADTH_TABLE_NAME)
 

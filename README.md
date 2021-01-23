@@ -52,6 +52,26 @@ aws dynamodb scan --table-name TABLE_NAME > export.json
 ```
 
 # 数据ID
+```shell
+# 股票
+US_STOCK_AAPL
+# ETF
+US_ETF_VTI
+US_ETF_FANGMAN
+# 经济数据
+US_ECONOMIC_WEI # 每周经济指数
+US_ECONOMIC_FFTRUL # 美联储最大利率   Federal Funds Target Range - Upper Limit
+US_ECONOMIC_FEDFUNDS # 美联储有效基金利率
+US_ECONOMIC_INFLATION # CPI  通胀比（Inflation Rates）
+ECONOMIC_USTREASURY_REALYIELD # 美国国库券真实收益率 5年 7年 10年 20年 30年
+US_SPDR_GOLD # 黄金价格 和黄金持仓量 公吨
+US_SYSTEM_SOMA_HOLDINGS # 美联储公开市场持仓
+```
+
+# 股票/ETF数据字段
+```python
+['hash_key', 'date', 'symbol', 'i18n', 'n', 'o', 'sma20', 'sma60', 'sma120', 'cs', 'sm', 'ml', 'h', 'l', 'c', 'chg1d', 'chgp1d', 'turnoverrate', 'amount', 'chgp20d', 'chgp5d']
+```
 
 
 # 国际化ID
