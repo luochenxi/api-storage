@@ -16,6 +16,9 @@ pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
 
+logging.basicConfig(level=logging.INFO, format="[%(name)s][%(funcName)s] %(message)s")
+logging.getLogger("awswrangler").setLevel(logging.DEBUG)
+logging.getLogger("botocore.credentials").setLevel(logging.CRITICAL)
 logger = logging.getLogger(__name__)
 
 column_dict = {
@@ -32,7 +35,7 @@ column_dict = {
     # df['second_revision'] = df['second_revision'].apply(lambda x: Decimal('%.3f' %  x))
     # df['final'] = df['final'].apply(lambda x: Decimal('%.3f' %  x))
 '''
-
+@utils.extract_context_info
 def wei():
     """Weekly Economic Index (WEI) https://www.newyorkfed.org/research/policy/weekly-economic-index"""
     resp = utils.get(cf.NEWYORKFED_WEI_URL)
@@ -59,6 +62,7 @@ def wei():
 https://www.quandl.com/api/v3/datasets/FRED/DFEDTARU.csv?api_key=DUdvbzr6ytDBqdR6zxxU
 Federal Funds Target Range - Upper Limit
 '''
+@utils.extract_context_info
 def fftr():
     '''Federal Funds Target Range - Upper Limit // 联储目标利益'''
     url = 'https://www.quandl.com/api/v3/datasets/FRED/DFEDTARU.csv?api_key=DUdvbzr6ytDBqdR6zxxU'
@@ -73,6 +77,7 @@ def fftr():
     # 写入到 aws dynamodb
     wr.dynamodb.put_df(df=df, table_name=cf.BREADTH_TABLE_NAME)
 
+@utils.extract_context_info
 def effr():
     '''Effective Federal Funds Rate 美联储有效基金利率'''
     url = 'https://www.quandl.com/api/v3/datasets/FRED/FEDFUNDS.csv?api_key=DUdvbzr6ytDBqdR6zxxU'
@@ -87,6 +92,7 @@ def effr():
     # 写入到 aws dynamodb
     wr.dynamodb.put_df(df=df, table_name=cf.BREADTH_TABLE_NAME)
 
+@utils.extract_context_info
 def INFLATION_USA():
     '''CPI RATEINF/INFLATION_USA  Inflation Rates'''
     url = 'https://www.quandl.com/api/v3/datasets/RATEINF/INFLATION_USA.csv?api_key=DUdvbzr6ytDBqdR6zxxU'
@@ -102,6 +108,7 @@ def INFLATION_USA():
     # 写入到 aws dynamodb
     wr.dynamodb.put_df(df=df, table_name=cf.BREADTH_TABLE_NAME)
 
+@utils.extract_context_info
 def USTREASURY_REALYIELD():
     column = ['5YR', '7YR','10YR', '20YR', '30YR','date']
     df = quandl.get("USTREASURY/REALYIELD", authtoken="DUdvbzr6ytDBqdR6zxxU")
@@ -120,6 +127,7 @@ def USTREASURY_REALYIELD():
     df = df.tail(3)
     wr.dynamodb.put_df(df=df, table_name=cf.BREADTH_TABLE_NAME)
 
+@utils.extract_context_info
 def gold():
     '''
     http://www.spdrgoldshares.com
@@ -149,6 +157,7 @@ def gold():
     df = df.tail(3)
     wr.dynamodb.put_df(df=df, table_name=cf.BREADTH_TABLE_NAME)
 
+@utils.extract_context_info
 def market_some_hold(url=cf.NEWYORKFED_SOMA_HOLD_URL):
     '''
     https://www.newyorkfed.org/markets/soma-holdings
@@ -169,7 +178,7 @@ def market_some_hold(url=cf.NEWYORKFED_SOMA_HOLD_URL):
     column = ['date', 'mbs', 'cmbs', 'tips', 'frn', 'tipsInflationCompensation',
               'notesbonds', 'bills', 'agencies', 'total']
     li = []
-    for k,v in summary.items():
+    for v in summary:
         li.append([
             v['asOfDate'], v['mbs'],v['cmbs'],v['tips'],v['frn'],
             v['tipsInflationCompensation'],v['notesbonds'],v['bills'],v['agencies'],v['total'],
@@ -190,7 +199,7 @@ def strfdate(str_date):
 
 if __name__ == '__main__':
     market_some_hold()
-    gold()
+    # gold()
     # USTREASURY_REALYIELD()
     # INFLATION_USA()
     # effr()

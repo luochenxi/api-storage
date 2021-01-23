@@ -29,6 +29,7 @@ def yf_float(df):
     df.index = range(0,len(df))
     return df
 
+@utils.extract_context_info
 def get(li = cf.LEFT):
     global OCG_DF, OCG
     for i in li:
@@ -57,6 +58,7 @@ def get(li = cf.LEFT):
             logger.error('req_exec.ConnectionError: {}'.format(i))
             continue
 
+@utils.extract_context_info
 def oli_copper_gold():
     logger.info(f'run oli_copper_gold...')
     hg = OCG_MAP['HG=F']
